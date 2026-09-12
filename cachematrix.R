@@ -1,49 +1,49 @@
-## Finding the inverse of a big matrix takes time. These two functions
-## work together so we only do that work once. The first time we ask
-## for the inverse, we calculate it and save it. Next time, we just
-## reuse the saved answer instead of calculating it again.
+# Programming Assignment 2 - caching a matrix inverse
+#
+# solve() on a big matrix isn't cheap, and there's no point running it
+# twice on the same matrix. So the plan here is simple: the first time
+# we invert a matrix, we hang on to the answer. If nothing about the
+# matrix has changed, the next call just reuses that answer instead of
+# doing the math again.
 
-## This function does not calculate anything. It just builds a "box"
-## that can hold a matrix and, later, its inverse.
-## The box gives us four small tools:
-##   set()        - put a new matrix in the box
-##   get()        - take the matrix out of the box
-##   setinverse() - save the inverse in the box
-##   getinverse() - take the saved inverse out of the box
-
+# makeCacheMatrix wraps a matrix in a little object that knows how to
+# hold on to its own inverse once someone bothers to calculate it.
+# It hands back 4 functions:
+#   set(y)       swap in a new matrix (this wipes any cached inverse)
+#   get()        return the current matrix
+#   setinverse() store an inverse we just calculated
+#   getinverse() return whatever inverse is currently stored (or NULL)
 makeCacheMatrix <- function(x = matrix()) {
-        inv <- NULL
-        set <- function(y) {
-                x <<- y
-                inv <<- NULL
-        }
-        get <- function() x
-        setinverse <- function(inverse) inv <<- inverse
-        getinverse <- function() inv
-        list(set = set, get = get,
-             setinverse = setinverse,
-             getinverse = getinverse)
+    cached_inv <- NULL
+
+    set <- function(y) {
+        x <<- y
+        cached_inv <<- NULL  # new matrix means the old inverse doesn't apply anymore
+    }
+    get <- function() x
+
+    setinverse <- function(solved) cached_inv <<- solved
+    getinverse <- function() cached_inv
+
+    list(set = set,
+         get = get,
+         setinverse = setinverse,
+         getinverse = getinverse)
 }
 
-
-## This function gives you the inverse of the matrix inside the box
-## made by makeCacheMatrix().
-## First it checks: did we already save the inverse before?
-##   - If yes, just hand back the saved one. No new work needed.
-##   - If no, calculate it now, save it in the box for next time,
-##     and then hand it back.
-
+# cacheSolve returns the inverse of whatever makeCacheMatrix object you
+# hand it. Nothing fancy - check if it's already been solved, and if
+# not, solve it and remember the answer for next time.
 cacheSolve <- function(x, ...) {
-        ## Check the box for an inverse we already saved
-        inv <- x$getinverse()
-        if (!is.null(inv)) {
-                message("getting cached data")
-                return(inv)
-        }
-        ## No saved inverse yet, so calculate it now
-        data <- x$get()
-        inv <- solve(data, ...)
-        ## Save it in the box for next time
-        x$setinverse(inv)
-        inv
+    inv <- x$getinverse()
+    if (!is.null(inv)) {
+        message("getting cached data")
+        return(inv)
+    }
+
+    mat <- x$get()
+    inv <- solve(mat, ...)
+    x$setinverse(inv)
+
+    inv
 }
