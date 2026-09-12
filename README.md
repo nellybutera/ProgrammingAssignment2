@@ -1,26 +1,24 @@
 ### Introduction
 
-This second programming assignment will require you to write an R
-function that is able to cache potentially time-consuming computations.
-For example, taking the mean of a numeric vector is typically a fast
-operation. However, for a very long vector, it may take too long to
-compute the mean, especially if it has to be computed repeatedly (e.g.
-in a loop). If the contents of a vector are not changing, it may make
-sense to cache the value of the mean so that when we need it again, it
-can be looked up in the cache rather than recomputed. In this
-Programming Assignment you will take advantage of the scoping rules of
-the R language and how they can be manipulated to preserve state inside
-of an R object.
+In this assignment you will write an R function that can "cache" a
+slow calculation. For example, finding the mean of a short list of
+numbers is fast. But finding the mean of a very long list can be slow,
+especially if you have to do it again and again (like inside a loop).
+If the list of numbers has not changed, there is no need to calculate
+the mean again — we can just save (cache) the answer from last time
+and reuse it. This assignment uses R's scoping rules to store, or
+"remember", values like this inside an R object.
 
 ### Example: Caching the Mean of a Vector
 
-In this example we introduce the `<<-` operator which can be used to
-assign a value to an object in an environment that is different from the
-current environment. Below are two functions that are used to create a
-special object that stores a numeric vector and caches its mean.
+This example uses the `<<-` operator. It lets a function save a value
+into an environment other than its own, so the value is remembered
+even after the function finishes running. Below are two functions that
+create a special object that stores a list of numbers and remembers
+its mean.
 
-The first function, `makeVector` creates a special "vector", which is
-really a list containing a function to
+The first function, `makeVector`, creates a special "vector". It is
+really a list of four small tools:
 
 1.  set the value of the vector
 2.  get the value of the vector
@@ -43,12 +41,12 @@ really a list containing a function to
                  getmean = getmean)
     }
 
-The following function calculates the mean of the special "vector"
-created with the above function. However, it first checks to see if the
-mean has already been calculated. If so, it `get`s the mean from the
-cache and skips the computation. Otherwise, it calculates the mean of
-the data and sets the value of the mean in the cache via the `setmean`
-function.
+The next function finds the mean of the special "vector" made above.
+First it checks: has the mean already been saved?
+
+- If yes, it just returns the saved mean. No new work needed.
+- If no, it calculates the mean now, saves it using `setmean`, and
+  then returns it.
 
     cachemean <- function(x, ...) {
             m <- x$getmean()
@@ -64,42 +62,42 @@ function.
 
 ### Assignment: Caching the Inverse of a Matrix
 
-Matrix inversion is usually a costly computation and there may be some
-benefit to caching the inverse of a matrix rather than computing it
-repeatedly (there are also alternatives to matrix inversion that we will
-not discuss here). Your assignment is to write a pair of functions that
-cache the inverse of a matrix.
+Finding the inverse of a matrix can be slow, so it can help to save
+(cache) the inverse instead of calculating it again each time (there
+are other ways to avoid inverting a matrix too, but we will not cover
+those here). Your job is to write two functions that cache the
+inverse of a matrix.
 
 Write the following functions:
 
-1.  `makeCacheMatrix`: This function creates a special "matrix" object
-    that can cache its inverse.
-2.  `cacheSolve`: This function computes the inverse of the special
-    "matrix" returned by `makeCacheMatrix` above. If the inverse has
-    already been calculated (and the matrix has not changed), then
-    `cacheSolve` should retrieve the inverse from the cache.
+1.  `makeCacheMatrix`: creates a special "matrix" object that can save
+    its own inverse.
+2.  `cacheSolve`: finds the inverse of the special "matrix" made by
+    `makeCacheMatrix`. If the inverse was already saved and the
+    matrix has not changed, `cacheSolve` just returns the saved
+    inverse instead of calculating it again.
 
-Computing the inverse of a square matrix can be done with the `solve`
-function in R. For example, if `X` is a square invertible matrix, then
-`solve(X)` returns its inverse.
+To find the inverse of a square matrix in R, use the `solve` function.
+For example, if `X` is a square, invertible matrix, then `solve(X)`
+gives you its inverse.
 
-For this assignment, assume that the matrix supplied is always
-invertible.
+For this assignment, assume the matrix you are given can always be
+inverted.
 
-In order to complete this assignment, you must do the following:
+To finish this assignment, do the following steps:
 
-1.  Fork the GitHub repository containing the stub R files at
-    [https://github.com/rdpeng/ProgrammingAssignment2](https://github.com/rdpeng/ProgrammingAssignment2)
-    to create a copy under your own account.
-2.  Clone your forked GitHub repository to your computer so that you can
-    edit the files locally on your own machine.
-3.  Edit the R file contained in the git repository and place your
-    solution in that file (please do not rename the file).
-4.  Commit your completed R file into YOUR git repository and push your
-    git branch to the GitHub repository under your account.
-5.  Submit to Coursera the URL to your GitHub repository that contains
-    the completed R code for the assignment.
+1.  Fork the GitHub repository with the starter R files, found at
+    [https://github.com/rdpeng/ProgrammingAssignment2](https://github.com/rdpeng/ProgrammingAssignment2),
+    so you get your own copy under your account.
+2.  Clone your forked repository to your computer so you can edit the
+    files on your own machine.
+3.  Edit the R file in the repository and add your solution (please
+    do not rename the file).
+4.  Commit your finished R file to YOUR git repository and push it to
+    your GitHub account.
+5.  Submit the URL of your GitHub repository to Coursera, with your
+    completed R code inside.
 
 ### Grading
 
-This assignment will be graded via peer assessment.
+This assignment is graded through peer assessment.
